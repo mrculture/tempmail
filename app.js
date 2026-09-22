@@ -79,7 +79,7 @@ function parseEmail(value) {
 
   const local = trimmed.slice(0, atIndex);
   const domain = normalizeDomain(trimmed.slice(atIndex + 1));
-  if (!local || local.length > 64 || !isValidDomain(domain)) return null;
+  if (!local || local.length > 64 || !/^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+$/i.test(local) || local.startsWith(".") || local.endsWith(".") || local.includes("..") || !isValidDomain(domain)) return null;
 
   return { local, domain, email: `${local}@${domain}` };
 }
@@ -98,7 +98,8 @@ function parseEntry(rawValue) {
   value = value.replace(/^[<("'`]+|[>)"',.;:!?`]+$/g, "");
   if (!value) return null;
 
-  const email = parseEmail(value);
+  const isUrl = /^https?:\/\//i.test(value);
+  const email = isUrl ? null : parseEmail(value);
   if (email) {
     return {
       raw: value,
@@ -109,7 +110,7 @@ function parseEntry(rawValue) {
     };
   }
 
-  if (!includeDomainsOnly.checked) {
+  if (!includeDomainsOnly.checked || (!isUrl && value.includes("@"))) {
     return {
       raw: value,
       type: "unknown",
@@ -233,7 +234,7 @@ function checkEntry(entry, allowlist, customBlocklist) {
   return {
     ...entry,
     disposable: false,
-    outcome: "Clean",
+    outcome: "Not listed",
     reason: "not_found",
     matchedDomain: "",
   };
@@ -268,7 +269,7 @@ function renderResults() {
   }
 
   const riskRatio = disposable / total;
-  riskState.textContent = riskRatio >= 0.5 ? "High risk" : disposable ? "Review needed" : "Looks clean";
+  riskState.textContent = riskRatio >= 0.5 ? "High risk" : disposable || invalid ? "Review needed" : "No matches";
   statusMessage.textContent = `${total.toLocaleString()} entries checked. ${disposable.toLocaleString()} disposable match${disposable === 1 ? "" : "es"} found.`;
 
   resultsBody.innerHTML = latestResults
@@ -346,8 +347,9 @@ async function copyReport() {
     statusMessage.textContent = "Report copied.";
   } catch {
     reportText.select();
-    document.execCommand("copy");
-    statusMessage.textContent = "Report copied using browser fallback.";
+    let copied = false;
+    try { copied = document.execCommand("copy"); } catch { /* Manual copy remains available. */ }
+    statusMessage.textContent = copied ? "Report copied using browser fallback." : "Clipboard blocked. Report selected; copy it manually.";
   }
 }
 
@@ -381,7 +383,9 @@ function downloadCsv() {
 }
 
 function csvCell(value) {
-  return `"${String(value || "").replace(/"/g, '""')}"`;
+  const text = String(value ?? "");
+  const safe = /^[\s]*[=+@-]/.test(text) ? "'" + text : text;
+  return `"${safe.replace(/"/g, '""')}"`;
 }
 
 function escapeHtml(value) {

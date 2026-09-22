@@ -61,6 +61,7 @@
 
           <textarea
             id="inputText"
+            aria-labelledby="input-title"
             rows="13"
             spellcheck="false"
             placeholder="user@mailinator.com&#10;customer@example.com&#10;mail.guerrillamail.com"
@@ -72,7 +73,7 @@
             <button class="secondary-action" id="downloadButton" type="button">Download CSV</button>
           </div>
 
-          <p class="status-line" id="statusMessage">Domain list ready.</p>
+          <p class="status-line" id="statusMessage" role="status">Domain list ready.</p>
         </section>
 
         <aside class="panel settings-panel" aria-labelledby="settings-title">
