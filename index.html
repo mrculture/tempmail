@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TempMail | Disposable Email Checker | UtilityShelf</title>
+    <meta
+      name="description"
+      content="Check emails and domains for disposable or temporary mail providers in your browser. Includes batch checks, subdomain matching, and custom allow/block lists."
+    />
+    <meta property="og:title" content="TempMail | UtilityShelf" />
+    <meta
+      property="og:description"
+      content="Check pasted emails, domains, or URLs against a bundled temporary-mail domain list in your browser."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tempmail.utilityshelf.site/" />
+    <link rel="canonical" href="https://tempmail.utilityshelf.site/" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="TempMail Shelf home">
+        <span class="brand-mark">TS</span>
+        <span>
+          <strong>TempMail Shelf</strong>
+          <small>UtilityShelf</small>
+        </span>
+      </a>
+      <p class="privacy-note">Runs locally in your browser. No account or upload.</p>
+    </header>
+
+    <main>
+      <section class="hero-tool" aria-labelledby="page-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Email risk check</p>
+          <h1 id="page-title">Spot disposable email domains before they hit your list.</h1>
+          <p>
+            Check pasted emails, domains, or URLs against a bundled temporary-mail domain list,
+            then export a clean review report for signup QA, lead cleanup, or form testing.
+          </p>
+          <div class="hero-actions">
+            <button class="primary-action" id="sampleButton" type="button">Load sample</button>
+            <button class="secondary-action" id="clearButton" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="hero-media" aria-hidden="true">
+          <img src="assets/tempmail-hero.png" alt="" />
+        </div>
+      </section>
+
+      <section class="workspace" aria-label="Disposable email checker workspace">
+        <section class="panel input-panel" aria-labelledby="input-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Input</p>
+              <h2 id="input-title">Emails, domains, or URLs</h2>
+            </div>
+            <span class="status-pill" id="dataStatus">Loading list</span>
+          </div>
+
+          <textarea
+            id="inputText"
+            rows="13"
+            spellcheck="false"
+            placeholder="user@mailinator.com&#10;customer@example.com&#10;mail.guerrillamail.com"
+          ></textarea>
+
+          <div class="input-actions">
+            <button class="primary-action" id="checkButton" type="button">Check list</button>
+            <button class="secondary-action" id="copyButton" type="button">Copy report</button>
+            <button class="secondary-action" id="downloadButton" type="button">Download CSV</button>
+          </div>
+
+          <p class="status-line" id="statusMessage">Domain list ready.</p>
+        </section>
+
+        <aside class="panel settings-panel" aria-labelledby="settings-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Overrides</p>
+              <h2 id="settings-title">Local lists</h2>
+            </div>
+          </div>
+
+          <label class="field">
+            <span>Always allow</span>
+            <textarea id="allowlistText" rows="4" spellcheck="false" placeholder="example.com"></textarea>
+          </label>
+
+          <label class="field">
+            <span>Always flag</span>
+            <textarea id="blocklistText" rows="4" spellcheck="false" placeholder="risky-mail.test"></textarea>
+          </label>
+
+          <label class="checkbox-row">
+            <input id="includeDomainsOnly" type="checkbox" checked />
+            <span>Include domain-only entries</span>
+          </label>
+          <label class="checkbox-row">
+            <input id="dedupeInput" type="checkbox" checked />
+            <span>Remove duplicate entries</span>
+          </label>
+        </aside>
+      </section>
+
+      <section class="summary-grid" aria-label="Check summary">
+        <article class="summary-card">
+          <span>Total checked</span>
+          <strong id="totalCount">0</strong>
+        </article>
+        <article class="summary-card is-warning">
+          <span>Disposable</span>
+          <strong id="disposableCount">0</strong>
+        </article>
+        <article class="summary-card is-good">
+          <span>Allowed</span>
+          <strong id="allowedCount">0</strong>
+        </article>
+        <article class="summary-card">
+          <span>Invalid</span>
+          <strong id="invalidCount">0</strong>
+        </article>
+      </section>
+
+      <section class="results-layout">
+        <section class="panel results-panel" aria-labelledby="results-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Results</p>
+              <h2 id="results-title">Review table</h2>
+            </div>
+            <span class="status-pill" id="riskState">No input</span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entry</th>
+                  <th>Domain</th>
+                  <th>Outcome</th>
+                  <th>Matched</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody">
+                <tr>
+                  <td colspan="5">Load the sample or paste a list to start.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel report-panel" aria-labelledby="report-title">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Report</p>
+              <h2 id="report-title">Plain text summary</h2>
+            </div>
+          </div>
+          <textarea id="reportText" rows="14" readonly></textarea>
+        </section>
+      </section>
+
+      <section class="content-guide" aria-labelledby="guide-title">
+        <div class="guide-intro">
+          <p class="eyebrow">Notes</p>
+          <h2 id="guide-title">Disposable email checks are one signal</h2>
+          <p>
+            Temporary-mail providers change often. A local blocklist can catch common disposable
+            services, but it should sit beside verification, rate limits, fraud checks, and manual
+            review for high-value workflows.
+          </p>
+        </div>
+        <div class="guide-grid">
+          <article>
+            <h3>Subdomain matching</h3>
+            <p>
+              The checker walks domain levels, so an address at a nested disposable-mail subdomain
+              can still be matched to the parent provider.
+            </p>
+          </article>
+          <article>
+            <h3>Override lists</h3>
+            <p>
+              Allow known test domains or flag internal risk domains without changing the bundled
+              public list.
+            </p>
+          </article>
+          <article>
+            <h3>Batch workflow</h3>
+            <p>
+              Paste exports from forms, CRM leads, support queues, or signup tests and download a
+              CSV for follow-up.
+            </p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-inner">
+        <p>TempMail Shelf is a UtilityShelf micro utility for disposable email review.</p>
+        <nav aria-label="Site policies">
+          <a href="terms.html">Terms</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script src="domain-data.js?v=20260605"></script>
+    <script src="app.js?v=20260605"></script>
+  </body>
+</html>
